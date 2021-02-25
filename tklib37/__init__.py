@@ -1,4 +1,5 @@
 from tkinter import *
+from datetime import date, datetime
 
 
 class IntEntry(Entry):
@@ -67,6 +68,34 @@ class BoolEntry(Checkbutton):
         self.set(not self.get())
 
 
+class DateEntry(Entry):
+    def __init__(self, master, **cfg):
+        self.var = StringVar(master, name=cfg.pop("name", None))
+        self.set(cfg.pop("value", None))
+        super().__init__(master, textvariable=self.var, **cfg)
+
+    def get(self):
+        return date.fromisoformat(self.var.get())
+
+    def set(self, value: date):
+        if isinstance(value, date):
+            self.var.set(value.isoformat())
+
+
+class DateTimeEntry(Entry):
+    def __init__(self, master, **cfg):
+        self.var = StringVar(master, name=cfg.pop("name", None))
+        self.set(cfg.pop("value", None))
+        super().__init__(master, textvariable=self.var, **cfg)
+
+    def get(self):
+        return datetime.fromisoformat(self.var.get())
+
+    def set(self, value: datetime):
+        if isinstance(value, datetime):
+            self.var.set(value.isoformat())
+
+
 def TypedEntry(root, type_, **cfg):
     if type_ is str:
         return StrEntry(root, **cfg)
@@ -76,5 +105,9 @@ def TypedEntry(root, type_, **cfg):
         return FloatEntry(root, **cfg)
     elif type_ is bool:
         return BoolEntry(root, **cfg)
+    elif type_ is date:
+        return DateEntry(root, **cfg)
+    elif type_ is datetime:
+        return DateTimeEntry(root, **cfg)
     else:
         raise Exception(f"TypedEntry doesn't handle {type_.__name__} type !")
