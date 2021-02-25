@@ -9,7 +9,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="tklib37",
-    version="1.0.2",
+    version="1.0.3",
     author="Gabriel Amare",
     author_email="gabriel.amare.31@gmail.com",
     description="Tkinter additional widgets library",
