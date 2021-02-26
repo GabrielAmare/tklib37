@@ -3,15 +3,24 @@ from datetime import date, datetime, timedelta
 
 
 class IntEntry(Entry):
-    def __init__(self, master, **cfg):
-        self.step = cfg.pop("step", None)
-
-        self.var = IntVar(master, value=cfg.pop("value", None), name=cfg.pop("name", None))
+    def __init__(self, master, step=None, callback=None, name=None, value=None, **cfg):
+        self.value = value
+        self.callback = callback
+        self.var = IntVar(master, value=value, name=name)
         super().__init__(master, textvariable=self.var, **cfg)
 
-        if self.step is not None and isinstance(self.step, int):
-            self.bind("<KeyPress-Up>", lambda _: self.add(self.step))
-            self.bind("<KeyPress-Down>", lambda _: self.sub(self.step))
+        if isinstance(step, int):
+            self.bind("<KeyPress-Up>", lambda _: self.add(step))
+            self.bind("<KeyPress-Down>", lambda _: self.sub(step))
+
+        if hasattr(callback, "__call__"):
+            self.var.trace("w", self.on_change)
+
+    def on_change(self, name, index, mode):
+        value = self.get()
+        if self.value != value:
+            self.value = value
+            self.callback(value)
 
     def get(self) -> int:
         return int(self.var.get())
@@ -27,15 +36,24 @@ class IntEntry(Entry):
 
 
 class FloatEntry(Entry):
-    def __init__(self, master, **cfg):
-        self.step = cfg.pop("step", None)
-
-        self.var = DoubleVar(master, value=cfg.pop("value", None), name=cfg.pop("name", None))
+    def __init__(self, master, step=None, callback=None, name=None, value=None, **cfg):
+        self.value = value
+        self.callback = callback
+        self.var = DoubleVar(master, value=value, name=name)
         super().__init__(master, textvariable=self.var, **cfg)
 
-        if self.step is not None and isinstance(self.step, int):
-            self.bind("<KeyPress-Up>", lambda _: self.add(self.step))
-            self.bind("<KeyPress-Down>", lambda _: self.sub(self.step))
+        if step is not None and isinstance(step, int):
+            self.bind("<KeyPress-Up>", lambda _: self.add(step))
+            self.bind("<KeyPress-Down>", lambda _: self.sub(step))
+
+        if hasattr(callback, "__call__"):
+            self.var.trace("w", self.on_change)
+
+    def on_change(self, name, index, mode):
+        value = self.get()
+        if self.value != value:
+            self.value = value
+            self.callback(value)
 
     def get(self) -> float:
         return float(self.var.get())
@@ -51,9 +69,20 @@ class FloatEntry(Entry):
 
 
 class StrEntry(Entry):
-    def __init__(self, master, **cfg):
-        self.var = StringVar(master, value=cfg.pop("value", None), name=cfg.pop("name", None))
+    def __init__(self, master, callback=None, name=None, value=None, **cfg):
+        self.value = value
+        self.callback = callback
+        self.var = StringVar(master, value=value, name=name)
         super().__init__(master, textvariable=self.var, **cfg)
+
+        if hasattr(callback, "__call__"):
+            self.var.trace("w", self.on_change)
+
+    def on_change(self, name, index, mode):
+        value = self.get()
+        if self.value != value:
+            self.value = value
+            self.callback(value)
 
     def get(self) -> str:
         return self.var.get()
@@ -66,9 +95,20 @@ class StrEntry(Entry):
 
 
 class BoolEntry(Checkbutton):
-    def __init__(self, master, **cfg):
-        self.var = BooleanVar(master, value=cfg.pop("value", None), name=cfg.pop("name", None))
+    def __init__(self, master, callback=None, name=None, value=None, **cfg):
+        self.value = value
+        self.callback = callback
+        self.var = BooleanVar(master, value=value, name=name)
         super().__init__(master, variable=self.var, **cfg)
+
+        if hasattr(callback, "__call__"):
+            self.var.trace("w", self.on_change)
+
+    def on_change(self, name, index, mode):
+        value = self.get()
+        if self.value != value:
+            self.value = value
+            self.callback(value)
 
     def get(self) -> bool:
         return self.var.get()
@@ -81,10 +121,22 @@ class BoolEntry(Checkbutton):
 
 
 class DateEntry(Entry):
-    def __init__(self, master, **cfg):
-        self.var = StringVar(master, name=cfg.pop("name", None))
-        self.set(cfg.pop("value", None))
+    def __init__(self, master, step=None, callback=None, name=None, value=None, **cfg):
+        self.value = value
+        self.callback = callback
+
+        self.var = StringVar(master, name=name)
+        self.set(value)
         super().__init__(master, textvariable=self.var, **cfg)
+
+        if hasattr(callback, "__call__"):
+            self.var.trace("w", self.on_change)
+
+    def on_change(self, name, index, mode):
+        value = self.get()
+        if self.value != value:
+            self.value = value
+            self.callback(value)
 
     def get(self) -> date:
         return date.fromisoformat(self.var.get())
@@ -95,16 +147,26 @@ class DateEntry(Entry):
 
 
 class DateTimeEntry(Entry):
-    def __init__(self, master, **cfg):
-        self.step = cfg.pop("step", None)
+    def __init__(self, master, step=None, callback=None, name=None, value=None, **cfg):
+        self.value = value
+        self.callback = callback
 
-        self.var = StringVar(master, name=cfg.pop("name", None))
-        self.set(cfg.pop("value", None))
+        self.var = StringVar(master, name=name)
+        self.set(value)
         super().__init__(master, textvariable=self.var, **cfg)
 
-        if self.step is not None and isinstance(self.step, timedelta):
-            self.bind("<KeyPress-Up>", lambda _: self.add(self.step))
-            self.bind("<KeyPress-Down>", lambda _: self.sub(self.step))
+        if isinstance(step, timedelta):
+            self.bind("<KeyPress-Up>", lambda _: self.add(step))
+            self.bind("<KeyPress-Down>", lambda _: self.sub(step))
+
+        if hasattr(callback, "__call__"):
+            self.var.trace("w", self.on_change)
+
+    def on_change(self, name, index, mode):
+        value = self.get()
+        if self.value != value:
+            self.value = value
+            self.callback(value)
 
     def get(self) -> datetime:
         return datetime.fromisoformat(self.var.get())
