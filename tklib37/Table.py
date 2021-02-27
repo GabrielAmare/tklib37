@@ -17,8 +17,7 @@ class Table(Frame):
 
     def _set_widget(self, row: int, col: int, cls, **cfg):
         widget = cls(self, **cfg)
-        widget.grid(row=row, column=col, sticky=NSEW)
-        self.widgets[(row, col)] = widget
+        self._put_widget(row, col, widget)
 
         if row not in self.row_weights:
             self.row_weights[row] = 1
@@ -39,39 +38,43 @@ class Table(Frame):
         return self.widgets.get((row, col), None)
 
     def _del_widget(self, row: int, col: int):
-        widget = self._get_widget(row, col)
+        widget = self._pop_widget(row, col)
         if widget:
-            widget.grid_forget()
             widget.destroy()
-            del self.widgets[(row, col)]
+
+    def _pop_widget(self, row: int, col: int):
+        if (row, col) in self.widgets:
+            widget = self.widgets.pop((row, col))
+            widget.grid_forget()
+            return widget
+
+    def _put_widget(self, row: int, col: int, widget):
+        if widget:
+            self.widgets[(row, col)] = widget
+            widget.grid(row=row, column=col, sticky=NSEW)
 
     def _invert_widgets(self, old_row: int, old_col: int, new_row: int, new_col: int):
-        old_widget = self._get_widget(old_row, old_col)
-        new_widget = self._get_widget(new_row, new_col)
+        old_widget = self._pop_widget(old_row, old_col)
+        new_widget = self._pop_widget(new_row, new_col)
 
-        if old_widget:
-            old_widget.grid_forget()
-        if new_widget:
-            new_widget.grid_forget()
-
-        new_widget.grid(row=old_row, column=old_col, sticky=NSEW)
-        old_widget.grid(row=new_row, column=new_col, sticky=NSEW)
+        self._put_widget(old_row, old_col, new_widget)
+        self._put_widget(new_row, new_col, old_widget)
 
     def _invert_rows(self, old_row: int, new_row: int):
         for col in range(self.n_cols):
             self._invert_widgets(old_row, col, new_row, col)
 
-        old_weight, new_weight = self.row_weights.get(old_row, 0), self.row_weights.get(new_row, 0)
-        self.rowconfigure(old_row, weight=old_weight)
-        self.rowconfigure(new_row, weight=new_weight)
+        self.row_weights[old_row], self.row_weights[new_row] = self.row_weights.get(new_row, 1), self.row_weights.get(old_row, 1)
+        self.rowconfigure(old_row, weight=self.row_weights[old_row])
+        self.rowconfigure(new_row, weight=self.row_weights[new_row])
 
     def _invert_cols(self, old_col: int, new_col: int):
         for row in range(self.n_rows):
             self._invert_widgets(row, old_col, row, new_col)
 
-        old_weight, new_weight = self.col_weights.get(old_col, 0), self.col_weights.get(new_col, 0)
-        self.columnconfigure(old_col, weight=old_weight)
-        self.columnconfigure(new_col, weight=new_weight)
+        self.col_weights[old_col], self.col_weights[new_col] = self.col_weights.get(new_col, 1), self.col_weights.get(old_col, 1)
+        self.columnconfigure(old_col, weight=self.col_weights[old_col])
+        self.columnconfigure(new_col, weight=self.col_weights[new_col])
 
     def set_widget(self, row, col, cls, **cfg):
         """Set a widget at a row & column"""

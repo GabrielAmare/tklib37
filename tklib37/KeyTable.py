@@ -43,8 +43,14 @@ class KeyTable(Table):
 
     def invert_rows(self, old_row, new_row):
         """Invert two rows"""
-        return self._invert_rows(self._get_row(old_row), self._get_row(new_row))
+        i_old_row, i_new_row = self._get_row(old_row), self._get_row(new_row)
+        self.bind_row(key=old_row, row=i_new_row)
+        self.bind_row(key=new_row, row=i_old_row)
+        return self._invert_rows(i_old_row, i_new_row)
 
     def invert_cols(self, old_col, new_col):
         """Invert two columns"""
-        return self._invert_rows(self._get_row(old_col), self._get_row(new_col))
+        i_old_col, i_new_col = self._get_col(old_col), self._get_col(new_col)
+        self.bind_col(key=old_col, col=i_new_col)
+        self.bind_col(key=new_col, col=i_old_col)
+        return self._invert_cols(i_old_col, i_new_col)
