@@ -11,13 +11,11 @@ class Demineur(Table):
         super().__init__(root, **cfg)
 
         self.bomb_proba = bomb_proba
-        self.n_rows = n_rows
-        self.n_cols = n_cols
         self.n_bombs = 0
         self.revealed = 0
-        self.n_cells = self.n_rows * self.n_cols
 
-        self.data = [[self.set_cell(row, col) for col in range(self.n_cols)] for row in range(self.n_rows)]
+        self.data = [[self.set_cell(row, col) for col in range(n_cols)] for row in range(n_rows)]
+        self.n_cells = self.n_rows * self.n_cols
 
         for row in range(self.n_rows):
             for col in range(self.n_cols):
