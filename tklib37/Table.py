@@ -76,6 +76,23 @@ class Table(Frame):
         self.columnconfigure(old_col, weight=self.col_weights[old_col])
         self.columnconfigure(new_col, weight=self.col_weights[new_col])
 
+    def _del_row(self, row: int):
+        for row_, col in self.widgets:
+            if row_ == row:
+                self.del_widget(row, col)
+
+        if row in self.row_weights:
+            del self.row_weights[row]
+        self.rowconfigure(row, weight=0)
+
+    def _del_col(self, col: int):
+        for row, col_ in self.widgets:
+            if col_ == col:
+                self.del_widget(row, col)
+        if col in self.col_weights:
+            del self.col_weights[col]
+        self.columnconfigure(col, weight=0)
+
     def set_widget(self, row, col, cls, **cfg):
         """Set a widget at a row & column"""
         return self._set_widget(row, col, cls, **cfg)
@@ -103,3 +120,11 @@ class Table(Frame):
     def invert_cols(self, old_col: int, new_col: int):
         """Invert two columns"""
         return self._invert_cols(old_col, new_col)
+
+    def del_row(self, row: int):
+        """Delete a row"""
+        self._del_row(row)
+
+    def del_col(self, col: int):
+        """Delete a column"""
+        self._del_col(col)

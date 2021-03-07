@@ -54,3 +54,11 @@ class KeyTable(Table):
         self.bind_col(key=old_col, col=i_new_col)
         self.bind_col(key=new_col, col=i_old_col)
         return self._invert_cols(i_old_col, i_new_col)
+
+    def del_row(self, row: int):
+        """Delete a row"""
+        self._del_row(self._get_row(row))
+
+    def del_col(self, col: int):
+        """Delete a column"""
+        self._del_col(self._get_col(col))
