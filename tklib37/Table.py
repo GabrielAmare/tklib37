@@ -77,18 +77,21 @@ class Table(Frame):
         self.columnconfigure(new_col, weight=self.col_weights[new_col])
 
     def _del_row(self, row: int):
-        for row_, col in self.widgets:
-            if row_ == row:
-                self.del_widget(row, col)
+        to_del = [col for row_, col in self.widgets if row_ == row]
+
+        for col in to_del:
+            self.del_widget(row, col)
 
         if row in self.row_weights:
             del self.row_weights[row]
         self.rowconfigure(row, weight=0)
 
     def _del_col(self, col: int):
-        for row, col_ in self.widgets:
-            if col_ == col:
-                self.del_widget(row, col)
+        to_del = [row for row, col_ in self.widgets if col_ == col]
+
+        for row in to_del:
+            self.del_widget(row, col)
+
         if col in self.col_weights:
             del self.col_weights[col]
         self.columnconfigure(col, weight=0)
