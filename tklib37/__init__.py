@@ -7,3 +7,4 @@ from .KeyTable import KeyTable
 from .SimpleForm import SimpleForm, FormHandler
 from .HorizontalSelector import HorizontalSelector
 from .VerticalSelector import VerticalSelector
+from .Clickable import Clickable
