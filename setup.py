@@ -3,7 +3,7 @@ from tklib37.__meta__ import __version__
 
 if __name__ == "__main__":
     setup(
-        name="tklib37_",
+        name="tklib37",
         version=__version__,
         author="Gabriel Amare", 
         author_email="gabriel.amare.31@gmail.com",
